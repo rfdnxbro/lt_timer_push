@@ -90,7 +90,7 @@ func main() {
 }
 
 func sendMessages(client *messaging.Client, fbc *firestore.Client, title string, body string) {
-	topic := "life"
+	topic := "life20201016"
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: title,
