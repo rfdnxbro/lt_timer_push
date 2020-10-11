@@ -31,12 +31,13 @@ func main() {
 	}
 	defer fbc.Close()
 
+	topic := "life20201016"
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	now := time.Now()
 	formatTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 0, 0, jst)
 	oneMinuteAfterFormatTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute()+1, 0, 0, jst)
 
-	startTimeIter := fbc.Collection("times").Where("starts_at", "==", formatTime).Documents(context.Background())
+	startTimeIter := fbc.Collection("times").Doc(topic).Collection("times").Where("starts_at", "==", formatTime).Documents(context.Background())
 	for {
 		timeDoc, err := startTimeIter.Next()
 		if err == iterator.Done {
@@ -46,10 +47,10 @@ func main() {
 			break
 		}
 		timeData := timeDoc.Data()
-		sendMessages(client, fbc, timeData["title"].(string), "スタートです")
+		sendMessages(client, fbc, timeData["title"].(string), "スタートです", topic)
 	}
 
-	endTimeIter := fbc.Collection("times").Where("ends_at", "==", formatTime).Documents(context.Background())
+	endTimeIter := fbc.Collection("times").Doc(topic).Collection("times").Where("ends_at", "==", formatTime).Documents(context.Background())
 	for {
 		timeDoc, err := endTimeIter.Next()
 		if err == iterator.Done {
@@ -59,10 +60,10 @@ func main() {
 			break
 		}
 		timeData := timeDoc.Data()
-		sendMessages(client, fbc, timeData["title"].(string), "終了です！！！")
+		sendMessages(client, fbc, timeData["title"].(string), "終了です！！！", topic)
 	}
 
-	oneStartTimeIter := fbc.Collection("times").Where("starts_at", "==", oneMinuteAfterFormatTime).Documents(context.Background())
+	oneStartTimeIter := fbc.Collection("times").Doc(topic).Collection("times").Where("starts_at", "==", oneMinuteAfterFormatTime).Documents(context.Background())
 	for {
 		timeDoc, err := oneStartTimeIter.Next()
 		if err == iterator.Done {
@@ -72,10 +73,10 @@ func main() {
 			break
 		}
 		timeData := timeDoc.Data()
-		sendMessages(client, fbc, timeData["title"].(string), "あと1分でスタートです")
+		sendMessages(client, fbc, timeData["title"].(string), "あと1分でスタートです", topic)
 	}
 
-	oneEndTimeIter := fbc.Collection("times").Where("ends_at", "==", oneMinuteAfterFormatTime).Documents(context.Background())
+	oneEndTimeIter := fbc.Collection("times").Doc(topic).Collection("times").Where("ends_at", "==", oneMinuteAfterFormatTime).Documents(context.Background())
 	for {
 		timeDoc, err := oneEndTimeIter.Next()
 		if err == iterator.Done {
@@ -85,12 +86,11 @@ func main() {
 			break
 		}
 		timeData := timeDoc.Data()
-		sendMessages(client, fbc, timeData["title"].(string), "終了まで残り1分です")
+		sendMessages(client, fbc, timeData["title"].(string), "終了まで残り1分です", topic)
 	}
 }
 
-func sendMessages(client *messaging.Client, fbc *firestore.Client, title string, body string) {
-	topic := "life20201016"
+func sendMessages(client *messaging.Client, fbc *firestore.Client, title string, body string, topic string) {
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: title,
