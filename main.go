@@ -90,29 +90,16 @@ func main() {
 }
 
 func sendMessages(client *messaging.Client, fbc *firestore.Client, title string, body string) {
-
-	messages := []*messaging.Message{}
-	iter := fbc.Collection("tokens").Documents(context.Background())
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			break
-		}
-		data := doc.Data()
-		ent := &messaging.Message{
-			Notification: &messaging.Notification{
-				Title: title,
-				Body:  body,
-			},
-			Token: data["token"].(string),
-		}
-		messages = append(messages, ent)
+	topic := "life"
+	message := &messaging.Message{
+		Notification: &messaging.Notification{
+			Title: title,
+			Body:  body,
+		},
+		Topic: topic,
 	}
 
-	_, err := client.SendAll(context.Background(), messages)
+	_, err := client.Send(context.Background(), message)
 	if err != nil {
 		log.Fatalln(err)
 	}
