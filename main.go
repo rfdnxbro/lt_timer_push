@@ -31,7 +31,7 @@ func main() {
 	}
 	defer fbc.Close()
 
-	topic := "life20201016"
+	topic := "brides20201030"
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	now := time.Now()
 	formatTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 0, 0, jst)
